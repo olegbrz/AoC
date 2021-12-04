@@ -109,6 +109,6 @@ def benchmark(function):
         t2 = time.time()
         t, u = convert_time(t2 - t1)
         print(
-            f"{bcolors.OKCYAN}{function.__name__}() took {t:.2f} {u}.{bcolors.ENDC}", end="\n↪ ")
+            f"{bcolors.OKCYAN}{function.__name__}() took {t:.2f} {u}.", end=f"\n↪ {bcolors.ENDC}")
         return result
     return wrapper
