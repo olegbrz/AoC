@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from aoc_helper import benchmark, get_input
 import numpy as np
 
