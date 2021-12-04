@@ -140,3 +140,4 @@ cython_debug/
 aoc_cookie.json
 prototype.ipynb
 input.*
+cache/
