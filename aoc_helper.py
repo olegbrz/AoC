@@ -5,6 +5,21 @@ from os import mkdir
 from requests import get
 from json import load
 from typing import List, Tuple
+from functools import wraps
+import time
+from timeit import timeit
+
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 
 def s_data() -> Tuple[int, int]:
@@ -70,3 +85,30 @@ def get_input(year: int = s_data()[0], day: int = s_data()[1], as_string=False) 
     print("----------------------------------------------------")
 
     return res
+
+
+def convert_time(t: float) -> Tuple[int, str]:
+    if t < 0.000001:
+        t, u = t * 1000000000, "ns"
+    elif t < 0.001:
+        t, u = t * 1000000, 4, "µs"
+    elif t < 1:
+        t, u = t * 1000, "ms"
+    elif t < 60:
+        t, u = t, 4, "sec"
+    else:
+        t, u = t / 60, 2, "min"
+    return(t, u)
+
+
+def benchmark(function):
+    @wraps(function)
+    def wrapper(*args, **kwargs):
+        t1 = time.time()
+        result = function(*args, **kwargs)
+        t2 = time.time()
+        t, u = convert_time(t2 - t1)
+        print(
+            f"{bcolors.OKCYAN}{function.__name__}() took {t:.2f} {u}.{bcolors.ENDC}", end="\n↪ ")
+        return result
+    return wrapper
