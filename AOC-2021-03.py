@@ -1,4 +1,4 @@
-from aoc_helper import get_input
+from aoc_helper import benchmark, get_input
 import numpy as np
 
 input_ = get_input()
@@ -6,6 +6,7 @@ input_ = np.array(
     list(map(lambda x: [int(digit) for digit in str(x)], input_)))
 
 
+@benchmark
 def fuel_consumption(data: np.array) -> int:
     c = [np.unique(data[:, col], return_counts=True)[1]
          for col in range(len(data[0]))]
@@ -16,6 +17,7 @@ def fuel_consumption(data: np.array) -> int:
     return gamma_rate * epsilon
 
 
+@benchmark
 def life_support_rating(data: np.array) -> int:
     def binlist2int(x): return int(''.join(map(str, list(x[0]))), 2)
     def filter_array(array, col, val): return array[array[:, col] == val, :]

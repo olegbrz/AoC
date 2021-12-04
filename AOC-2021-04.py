@@ -1,5 +1,5 @@
 from typing import List
-from aoc_helper import get_input
+from aoc_helper import get_input, benchmark
 import numpy as np
 
 input_ = get_input()
@@ -32,6 +32,7 @@ def check_board(board: np.array) -> bool:
     return False
 
 
+@benchmark
 def giant_squid(data: List[str], find_last: bool = False) -> int:
     numbers, boards = get_numbers(data), get_boards(data)
     wins = []
