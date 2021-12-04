@@ -1,4 +1,7 @@
+from genericpath import isdir
 from sys import argv
+from os.path import isfile, isdir
+from os import mkdir
 from requests import get
 from json import load
 from typing import List, Tuple
@@ -31,23 +34,39 @@ def get_input(year: int = s_data()[0], day: int = s_data()[1], as_string=False) 
     Returns:
         List[str]: all lines from input data.
     """
-    # Load the cookie from .json
-    with open('aoc_cookie.json') as c:
-        data = load(c)
-    headers = {'cookie': data['cookie']}
-    url = f"https://adventofcode.com/{year}/day/{day}/input"
-    # HTTP GET data
-    print(f"HTTP GET: {url}")
-    r = get(url, headers=headers)
-    res = r.text
+    if not isdir("cache"):
+        mkdir("cache")
+    possible_file = f"cache/AOC-{year}-{day}.txt"
+
+    if isfile(possible_file):
+        print(f"Using cached file {possible_file} as input")
+        with open(possible_file) as t:
+            res = t.read()
+    else:
+        # Load the cookie from .json
+        with open('aoc_cookie.json') as c:
+            data = load(c)
+        headers = {'cookie': data['cookie']}
+        url = f"https://adventofcode.com/{year}/day/{day}/input"
+
+        # HTTP GET data
+        print(f"HTTP GET: {url}")
+        r = get(url, headers=headers)
+        res = r.text
+
+        for i in ["Date", "Content-Type", "Content-Length", "Server-Ip"]:
+            print(f"{i}: {r.headers[i]}")
+
+        print(f"\nGET: {r.status_code}{' OK' if r.ok else ''}\n" +
+              f"Input-Length: {len(res)}")
+
+        with open(possible_file, "w") as t:
+            t.write(res)
+
+        print(f"Stored input in {possible_file}")
+
     if not as_string:
         res = res.split('\n')[:-1]
-
-    for i in r.headers.keys():
-        print(f"{i}: {r.headers[i]}")
-
-    print(f"\nGET: {r.status_code}{' OK' if r.ok else ''}\n" +
-          f"Input length: {len(res)}")
     print("----------------------------------------------------")
 
     return res
