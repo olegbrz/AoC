@@ -4,7 +4,7 @@ from os.path import isfile, isdir
 from os import mkdir
 from requests import get
 from json import load
-from typing import List, Tuple
+from typing import List, Tuple, Union
 from functools import wraps
 import time
 from timeit import timeit
@@ -35,7 +35,9 @@ def s_data() -> Tuple[int, int]:
     return (year, day)
 
 
-def get_input(year: int = s_data()[0], day: int = s_data()[1], as_string=False) -> List[str]:
+def get_input(year: int = s_data()[0],
+              day: int = s_data()[1],
+              as_string=False) -> Union[List[str], str]:
     """get_input get the input data for a given year-day challenge of Advent of
     Code. The process is made through HTTP GET request, using AoC's session
     cookie.
@@ -91,13 +93,13 @@ def convert_time(t: float) -> Tuple[int, str]:
     if t < 0.000001:
         t, u = t * 1000000000, "ns"
     elif t < 0.001:
-        t, u = t * 1000000, 4, "µs"
+        t, u = t * 1000000, "µs"
     elif t < 1:
         t, u = t * 1000, "ms"
     elif t < 60:
-        t, u = t, 4, "sec"
+        t, u = t, "sec"
     else:
-        t, u = t / 60, 2, "min"
+        t, u = t / 60, "min"
     return(t, u)
 
 
@@ -109,6 +111,6 @@ def benchmark(function):
         t2 = time.time()
         t, u = convert_time(t2 - t1)
         print(
-            f"{bcolors.OKCYAN}{function.__name__}() took {t:.2f} {u}.", end=f"\n↪ {bcolors.ENDC}")
+            f"{bcolors.OKCYAN}┌─({function.__name__})─[{t:.2f} {u}]", end=f"\n└─> {bcolors.ENDC}")
         return result
     return wrapper
