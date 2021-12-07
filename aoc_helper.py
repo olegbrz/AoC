@@ -7,7 +7,6 @@ from json import load
 from typing import List, Tuple, Union
 from functools import wraps
 import time
-from timeit import timeit
 
 
 class bcolors:
