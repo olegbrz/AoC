@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from typing import Dict, List
-from aoc_helper import get_input
+from aoc_helper import get_input, benchmark
 
 
 def proc_dive(params: Dict, instr: str, val: int) -> None:
@@ -24,6 +24,7 @@ def proc_dive_alt(params: Dict, instr: str, val: int) -> None:
         params["aim"] -= val
 
 
+@benchmark
 def dive(data: List[str], alt: bool = False) -> int:
     params = {"aim": 0, "depth": 0, "h_pos": 0}
     update_params = proc_dive_alt if alt else proc_dive

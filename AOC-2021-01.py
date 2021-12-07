@@ -2,11 +2,12 @@
 # -*- coding: utf-8 -*-
 
 from typing import List
-from aoc_helper import get_input
+from aoc_helper import get_input, benchmark
 
 input_ = list(map(int, get_input()))
 
 
+@benchmark
 def sonar_sweep(data: List[int], w_size: int = 1) -> int:
     wind = [sum(data[i-w_size+1:i+1])
             for i in range(w_size-1, len(data))]
