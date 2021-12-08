@@ -25,10 +25,7 @@ def non_intersection(x, y):
 def get_1478(data):
     numbers = 0
     for line in data:
-        patterns, output_digits = line.split(" | ")
-        patterns = patterns.split()
-        output_digits = output_digits.split()
-        for digit in output_digits:
+        for digit in line.split(" | ")[1].split():
             if len(digit) in [2, 3, 4, 7]:
                 numbers += 1
     return numbers
