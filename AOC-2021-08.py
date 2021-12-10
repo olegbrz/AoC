@@ -1,22 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from typing import List, Tuple
 from aoc_helper import get_input, benchmark
 
 
-def sort_string(x): return ''.join(sorted(x))
+def sort_string(x: str) -> str: return ''.join(sorted(x))
 
 
-def contains(x, y):
+def contains(x: Tuple[str, str], y: Tuple[str, str]) -> bool:
     return x[0] in y and x[1] in y
 
 
-def non_intersection(x, y):
+def non_intersection(x: List[str], y: List[str]) -> str:
     return sort_string(set(x) ^ set(y))
 
 
-@benchmark
-def get_1478(data):
+@ benchmark
+def get_1478(data: List[str]) -> int:
     numbers = 0
     for line in data:
         for digit in line.split(" | ")[1].split():
@@ -25,8 +26,8 @@ def get_1478(data):
     return numbers
 
 
-@benchmark
-def get_mappings(data):
+@ benchmark
+def get_mappings(data: List[str]) -> int:
     sum_of_outputs = 0
     for line in data:
         m = {}

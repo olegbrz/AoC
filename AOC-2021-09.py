@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+from typing import List, Tuple
 from aoc_helper import get_input, benchmark
 import numpy as np
 
 
-def floodfill(matrix, i, j):
+def floodfill(matrix: np.array, i: int, j: int) -> int:
     filled = 0
     # "hidden" stop clause - not reinvoking for "c" or "b", only for "a".
     if matrix[i, j] < 9:
@@ -23,7 +24,7 @@ def floodfill(matrix, i, j):
     return filled
 
 
-def neighbours(i, j, m, n):
+def neighbours(i: int, j: int, m: int, n: int) -> List[Tuple[int, int]]:
     adjacent_indices = []
     if i > 0:
         adjacent_indices.append((i-1, j))
@@ -37,7 +38,7 @@ def neighbours(i, j, m, n):
 
 
 @benchmark
-def smoke_basin(data, find_biggest=False):
+def smoke_basin(data: List[int], find_biggest: bool = False) -> int:
     d = np.array(data)
     risk = 0
     sizes = []
