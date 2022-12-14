@@ -10,15 +10,15 @@ import time
 
 
 class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+    HEADER = "\033[95m"
+    OKBLUE = "\033[94m"
+    OKCYAN = "\033[96m"
+    OKGREEN = "\033[92m"
+    WARNING = "\033[93m"
+    FAIL = "\033[91m"
+    ENDC = "\033[0m"
+    BOLD = "\033[1m"
+    UNDERLINE = "\033[4m"
 
 
 def s_data() -> Tuple[int, int]:
@@ -30,13 +30,13 @@ def s_data() -> Tuple[int, int]:
     Returns:
         Tuple[int, int]: year and day numbers.
     """
-    year, day = map(int, argv[0].split('/')[-1].split('.')[0].split('-')[1:])
+    year, day = map(int, argv[0].split("/")[-1].split(".")[0].split("_")[1:])
     return (year, day)
 
 
-def get_input(year: int = s_data()[0],
-              day: int = s_data()[1],
-              as_string=False) -> Union[List[str], str]:
+def get_input(
+    year: int = s_data()[0], day: int = s_data()[1], as_string=False
+) -> Union[List[str], str]:
     """get_input get the input data for a given year-day challenge of Advent of
     Code. The process is made through HTTP GET request, using AoC's session
     cookie.
@@ -60,9 +60,9 @@ def get_input(year: int = s_data()[0],
             res = t.read()
     else:
         # Load the cookie from .json
-        with open('aoc_cookie.json') as c:
+        with open("aoc_cookie.json") as c:
             data = load(c)
-        headers = {'cookie': data['cookie']}
+        headers = {"cookie": data["cookie"]}
         url = f"https://adventofcode.com/{year}/day/{day}/input"
 
         # HTTP GET data
@@ -73,8 +73,10 @@ def get_input(year: int = s_data()[0],
         for i in ["Date", "Content-Type", "Content-Length", "Server-Ip"]:
             print(f"{i}: {r.headers[i]}")
 
-        print(f"\nGET: {r.status_code}{' OK' if r.ok else ''}\n" +
-              f"Input-Length: {len(res)}")
+        print(
+            f"\nGET: {r.status_code}{' OK' if r.ok else ''}\n"
+            + f"Input-Length: {len(res)}"
+        )
 
         with open(possible_file, "w") as t:
             t.write(res)
@@ -82,7 +84,7 @@ def get_input(year: int = s_data()[0],
         print(f"Stored input in {possible_file}")
 
     if not as_string:
-        res = res.split('\n')[:-1]
+        res = res.split("\n")[:-1]
     print("----------------------------------------------------")
 
     return res
@@ -99,7 +101,23 @@ def convert_time(t: float) -> Tuple[int, str]:
         t, u = t, "sec"
     else:
         t, u = t / 60, "min"
-    return(t, u)
+    return (t, u)
+
+
+def parsing_benchmark(function):
+    @wraps(function)
+    def wrapper(*args, **kwargs):
+        t1 = time.time()
+        result = function(*args, **kwargs)
+        t2 = time.time()
+        t, u = convert_time(t2 - t1)
+        print(
+            f"{bcolors.OKCYAN}┌─📝─PARSING────[{function.__name__ + '()]':─<30}⌛─[{t:6.2f} {u}]",
+            end=f"\n└─> {bcolors.ENDC}Not neccesary to print\n",
+        )
+        return result
+
+    return wrapper
 
 
 def benchmark(function):
@@ -110,6 +128,9 @@ def benchmark(function):
         t2 = time.time()
         t, u = convert_time(t2 - t1)
         print(
-            f"{bcolors.OKCYAN}┌─({function.__name__})─[{t:.2f} {u}]", end=f"\n└─> {bcolors.ENDC}")
+            f"{bcolors.OKCYAN}┌─🖥️ ─COMPUTING──[{function.__name__ + '()]':─<30}⌛─[{t:6.2f} {u}]",
+            end=f"\n└─> {bcolors.ENDC}",
+        )
         return result
+
     return wrapper
