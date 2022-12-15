@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import multiprocessing as mp
 from aoc_helper import *
 import math
 
@@ -18,7 +19,7 @@ class Sensor:
             self.sensor_x, self.sensor_y, self.beacon_x, self.beacon_y
         )
 
-    def sens_interval(self, y: int) -> List[int]:
+    def sens_interval_y(self, y: int) -> List[int]:
         y_diff = abs(y - self.sensor_y)
         if y_diff > self.sens_range:
             return []
@@ -27,6 +28,17 @@ class Sensor:
             return [
                 self.sensor_x - remain,
                 self.sensor_x + remain,
+            ]
+
+    def sens_interval_x(self, x: int) -> List[int]:
+        x_diff = abs(x - self.sensor_x)
+        if x_diff > self.sens_range:
+            return []
+        else:
+            remain = self.sens_range - x_diff
+            return [
+                self.sensor_y - remain,
+                self.sensor_y + remain,
             ]
 
     def get_max_x(self) -> int:
@@ -85,7 +97,7 @@ def get_beacons(sensors: List[Sensor]) -> List[Tuple[int, int]]:
 @benchmark
 def compute_inaccesible(sensors: List[Sensor], y: int = 2_000_000) -> int:
     ranges = get_intersection(
-        [s.sens_interval(y) for s in sensors if s.sens_interval(y)]
+        [s.sens_interval_y(y) for s in sensors if s.sens_interval_y(y)]
     )
     return sum([r[1] - r[0] for r in ranges])
 
@@ -105,25 +117,54 @@ def get_intersection(intervals: List[List[int]]) -> List[List[int]]:
     return intersection
 
 
-def search_lost_beacon(sensors: List[Sensor]) -> int:
-    beacon_freq = lambda x, y: x * 4_000_000 + y
-    for y in range(3_000_000, 4_000_000):
+def search_lost_beacon(sensors: List[Sensor], start_y: int, finish_y: int) -> int:
+    for y in range(start_y, finish_y):
+
         intersec = get_intersection(
-            [s.sens_interval(y) for s in sensors if s.sens_interval(y)]
+            [s.sens_interval_y(y) for s in sensors if s.sens_interval_y(y)]
         )
         # If the range breaks in two intersections, the beacon can be placed in the middle
         if len(intersec) > 1:
             return intersec[0][-1] + 1, y
+    return -1, -1
+
+
+# Multiprocessing version of the search (reduces pt. 2 from 45 segs to 15 segs)
+def search_lost_beacon_mt(sensors: List[Sensor]) -> Tuple[int, int]:
+    with mp.Pool(10) as p:
+        # Divide the search space in 10 different ranges
+        y_ranges = [
+            (0, 400_000),
+            (400_000, 800_000),
+            (800_000, 1_200_000),
+            (1_200_000, 1_600_000),
+            (1_600_000, 2_000_000),
+            (2_000_000, 2_400_000),
+            (2_400_000, 2_800_000),
+            (2_800_000, 3_200_000),
+            (3_200_000, 3_600_000),
+            (3_600_000, 4_000_000),
+        ]
+        # Search for the beacon in each range of y values
+        res = p.starmap(
+            search_lost_beacon,
+            [(sensors, y_range[0], y_range[1]) for y_range in y_ranges],
+        )
+        # Return the first solution found
+        for r in res:
+            if r != (-1, -1):
+                return r
+    print("Finished")
+    return -1, -1
 
 
 @benchmark
 def lost_beacon_freq(sensors: List[Sensor]) -> int:
-    x, y = search_lost_beacon(sensors)
+    x, y = search_lost_beacon_mt(sensors)
     return x * 4_000_000 + y
 
 
 if __name__ == "__main__":
     sensors = parse_input(get_input())
-    [print(s) for s in sensors]
     print(f"Part 1: {compute_inaccesible(sensors)}")
     print(f"Part 2: {lost_beacon_freq(sensors)}")
