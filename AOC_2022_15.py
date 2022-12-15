@@ -131,19 +131,16 @@ def search_lost_beacon(sensors: List[Sensor], start_y: int, finish_y: int) -> in
 
 # Multiprocessing version of the search (reduces pt. 2 from 45 segs to 15 segs)
 def search_lost_beacon_mt(sensors: List[Sensor]) -> Tuple[int, int]:
+    nears = search_near_pairs(sensors)
+    fl = [s2 for s in nears for s2 in s]
+    min_y = min([s.sensor_y for s in fl])
+    max_y = max([s.sensor_y for s in fl])
+    diff_y = max_y - min_y
     with mp.Pool(10) as p:
         # Divide the search space in 10 different ranges
         y_ranges = [
-            (0, 400_000),
-            (400_000, 800_000),
-            (800_000, 1_200_000),
-            (1_200_000, 1_600_000),
-            (1_600_000, 2_000_000),
-            (2_000_000, 2_400_000),
-            (2_400_000, 2_800_000),
-            (2_800_000, 3_200_000),
-            (3_200_000, 3_600_000),
-            (3_600_000, 4_000_000),
+            (min_y + i * diff_y // 10, min_y + (i + 1) * diff_y // 10)
+            for i in range(0, 11)
         ]
         # Search for the beacon in each range of y values
         res = p.starmap(
@@ -154,8 +151,19 @@ def search_lost_beacon_mt(sensors: List[Sensor]) -> Tuple[int, int]:
         for r in res:
             if r != (-1, -1):
                 return r
-    print("Finished")
     return -1, -1
+
+
+def search_near_pairs(sensors):
+    nears = []
+    for s in sensors:
+        for s2 in sensors:
+            if manhattan_distance(s.sensor_x, s.sensor_y, s2.sensor_x, s2.sensor_y) == (
+                s.sens_range + s2.sens_range + 2
+            ):
+                if not [s2, s] in nears and not [s, s2] in nears:
+                    nears.append([s, s2])
+    return nears
 
 
 @benchmark
