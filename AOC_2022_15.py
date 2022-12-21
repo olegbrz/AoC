@@ -136,11 +136,12 @@ def search_lost_beacon_mt(sensors: List[Sensor]) -> Tuple[int, int]:
     min_y = min([s.sensor_y for s in fl])
     max_y = max([s.sensor_y for s in fl])
     diff_y = max_y - min_y
-    with mp.Pool(10) as p:
+    cores = mp.cpu_count()
+    with mp.Pool(cores) as p:
         # Divide the search space in 10 different ranges
         y_ranges = [
-            (min_y + i * diff_y // 10, min_y + (i + 1) * diff_y // 10)
-            for i in range(0, 11)
+            (min_y + i * diff_y // cores, min_y + (i + 1) * diff_y // cores)
+            for i in range(12)
         ]
         # Search for the beacon in each range of y values
         res = p.starmap(
