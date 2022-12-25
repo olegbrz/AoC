@@ -28,20 +28,24 @@ def b10_to_snafu(number: int) -> str:
     while r != 0:
         remainders = [r - 5**bit * coeff for coeff in coeffs]
         dist_0 = [abs(i) for i in remainders]
+        best_idx = dist_0.index(min(dist_0))
 
-        best_coeff = coeffs[dist_0.index(min(dist_0))]
-        best_remainder = remainders[dist_0.index(min(dist_0))]
-        if abs(best_remainder) < abs(r):
-            r = best_remainder
-            bits[bit] = best_coeff
+        best_c = coeffs[best_idx]
+        best_r = remainders[best_idx]
+        if abs(best_r) < abs(r):
+            r = best_r
+            bits[bit] = best_c
         else:
             bits[bit] = 0
         bit -= 1
 
-    # Replace -1 with -, -2 with =
-    replace_neg_coeff = lambda x: "-" if x == -1 else "=" if x == -2 else str(x)
-    # Convert to Little Endian SNAFU string
-    bits = "".join(map(replace_neg_coeff, reversed(bits)))
+    # Replace -1 with -, -2 with = and convert to Little Endian SNAFU string
+    bits = "".join(
+        map(
+            lambda x: "-" if x == -1 else "=" if x == -2 else str(x),
+            reversed(bits),
+        )
+    )
     return bits
 
 
