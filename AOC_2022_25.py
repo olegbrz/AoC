@@ -23,9 +23,9 @@ def b10_to_snafu(number: int) -> str:
     bits = [0] * bits_needed
     bit = bits_needed - 1
     r = number
+    coeffs = [-2, -1, 0, 1, 2]
 
     while r != 0:
-        coeffs = [-2, -1, 0, 1, 2]
         remainders = [r - 5**bit * coeff for coeff in coeffs]
         dist_0 = [abs(i) for i in remainders]
 
@@ -38,11 +38,10 @@ def b10_to_snafu(number: int) -> str:
             bits[bit] = 0
         bit -= 1
 
-    # Change from Big Endian to Little Endian
-    bits = reversed([str(i) for i in bits])
     # Replace -1 with -, -2 with =
-    replace_neg_coeff = lambda x: "-" if x == "-1" else "=" if x == "-2" else x
-    bits = "".join(map(replace_neg_coeff, bits))
+    replace_neg_coeff = lambda x: "-" if x == -1 else "=" if x == -2 else str(x)
+    # Convert to Little Endian SNAFU string
+    bits = "".join(map(replace_neg_coeff, reversed(bits)))
     return bits
 
 
